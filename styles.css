@@ -1,0 +1,18 @@
+/*
+Introduction
+This example of a School Capacity page takes a sample of schools data from https://get-information-schools.service.gov.uk/ and then displays a circle representing the school capacity and the school name on a svg representing the coordinates returned from https://www.getthedata.com/open-postcode-geo-api
+
+Task
+User feedback has indicated the current map is difficult to use once all schools are displayed due to overlapping elements
+Complete the task below to rewrite the School capacity javascript to display Local Authorities capacity and names instead of schools
+You are not expected to change the utility functions to complete this task
+We will use different sample data to compare your solution with our reference solution
+
+Scenario: User views the LA Capacity page
+  When a user views the page
+  When the page has loaded
+  Then the SVG id="cont" displays a circle for each local authority
+  And each circle is scaled according to the school capacity of that local authority
+  And each circle is located in an appropriate location for that local authority
+  And each circle is labelled with the local authority name
+*/
