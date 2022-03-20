@@ -866,10 +866,7 @@ function renameKeys() {
     renameKey("LA (name)", "LA_Name");
 }
 
-function sortSchoolDataCopy() {
-    schoolDataCopy.sort((a, b) => (a.LA_Code > b.LA_Code) ? 1 : ((b.LA_Code > a.LA_Code) ? -1 : 0))
-}
-
+//renames a single key
 function renameKey(oldKey, newKey) {
     for (var i = 0; i < schoolDataCopy.length; i++) {
         var obj = schoolDataCopy[i];
@@ -884,9 +881,10 @@ function renameKey(oldKey, newKey) {
         }
     }
 }
+
 //reduce elements in schoolDataCopy that have the same LA_Code into a single element
-//add property for the sum of all school capacities
-//sums all school capacities for that LA_Code and puts into the SumCapacity property
+//by comparing all the processed item with the current item being processed
+//if they has same LA_Code it reduces it to a single element and adds if needed and updates the SumCapacity
 function collateSchoolCapacities() {
     const initialValue = [];
     //using different name to global LAData variable
@@ -908,7 +906,6 @@ function collateSchoolCapacities() {
 //process schools data
 projectSchoolDataIntoSchoolDataCopy();
 renameKeys();
-sortSchoolDataCopy();
 var LAData = collateSchoolCapacities();
 let LAs = LAData.reduce(function(allLAs, LA) {
     allLAs[LA.LA_Name] = {
