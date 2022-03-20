@@ -844,13 +844,13 @@ function drawcircle(easting, northing, size, label, identifier) {
     container.appendChild(newText);
 }
 
-//start of my code 
 let schoolDataCopy = [];
 
 function projectSchoolDataIntoSchoolDataCopy() {
     schoolDataCopy = [];
     for (var i = 0; i < schooldata.length; i++) {
         var obj = schooldata[i];
+        //isNaN returns false for empty string
         if (isNaN(obj.SchoolCapacity) || obj.SchoolCapacity === "") {
             obj.SchoolCapacity = 0;
         }
@@ -901,7 +901,7 @@ function collateSchoolCapacities() {
     }, initialValue);
     return laData;
 }
-//end of my code
+
 
 //process schools data
 projectSchoolDataIntoSchoolDataCopy();
