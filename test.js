@@ -845,75 +845,50 @@ function drawcircle(easting, northing, size, label, identifier) {
 }
 
 //start my code 
-let schooldatacopy = [];
+let schoolDataCopy = [];
 
-function copySchoolsArray() {
-    console.log("copySchoolsArray");
-    schooldatacopy = [];
+function projectSchoolDataIntoSchoolDataCopy() {
+    schoolDataCopy = [];
     for (var i = 0; i < schooldata.length; i++) {
         var obj = schooldata[i];
         if (obj["LA (code)"] !== 0) {
-            //schooldatacopy.push(obj);
-            schooldatacopy.push(obj);
+            schoolDataCopy.push(obj);
         }
     }
 }
 
 
-function replaceKeys() {
-    console.log("replaceKeys");
-    replaceKey("LA (code)", "LA_Code");
-    replaceKey("LA (name)", "LA_Name");
+function renameKeys() {
+    renameKey("LA (code)", "LA_Code");
+    renameKey("LA (name)", "LA_Name");
 }
 
-function sortSchoolsArray() {
-    console.log("sortSchoolsArray");
-    schooldatacopy.sort((a, b) => (a.LA_Code > b.LA_Code) ? 1 : ((b.LA_Code > a.LA_Code) ? -1 : 0))
+function sortSchoolDataCopy() {
+    schoolDataCopy.sort((a, b) => (a.LA_Code > b.LA_Code) ? 1 : ((b.LA_Code > a.LA_Code) ? -1 : 0))
 }
 
 //utilities
-function replaceKey(oldKey, newKey) {
-    console.log("replaceKey", newKey);
-    for (var i = 0; i < schooldatacopy.length; i++) {
-
-        var obj = schooldatacopy[i];
+function renameKey(oldKey, newKey) {
+    for (var i = 0; i < schoolDataCopy.length; i++) {
+        var obj = schoolDataCopy[i];
         if (obj[oldKey] !== undefined) {
             obj[newKey] = obj[oldKey];
             obj[newKey].value = obj[oldKey].value;
-
             delete(obj[oldKey]);
-            schooldatacopy.push(obj);
+            schoolDataCopy.push(obj);
         }
     }
 }
 
-function collate() {
-
-
-    /* var prop2map = {};
-    yourArray.forEach(function(entry) {
-        prop2map[entry.prop2] = entry;
-    }); */
-
-    var stored = schooldatacopy.reduce(function(pV, cV, cI) {
-        console.log("pv", pV);
-
-        console.log("cv.LA_Code", cV.LA_Code);
-
-        //
+function collateSchoolCapacities() {
+    var stored = schoolDataCopy.reduce(function(pV, cV, cI) {
         var index = pV.findIndex(x => x.LA_Code === cV.LA_Code)
         console.log("index", index);
         if (index === -1) {
             pV.push(cV);
         }
-
-
-        // }
-
         return pV;
-        // *********  Important ******
     }, []);
-    console.log("stored", stored)
 }
 //end my code
 
@@ -923,10 +898,10 @@ let schools = schooldata.reduce(function(allSchools, school) {
         SchoolCapacity: school.SchoolCapacity || 0,
         coordinates: []
     };
-    copySchoolsArray();
-    replaceKeys();
-    sortSchoolsArray();
-    collate();
+    projectSchoolDataIntoSchoolDataCopy();
+    renameKeys();
+    sortSchoolDataCopy();
+    collateSchoolCapacities();
     //console.log(schooldatacopy);
     getcoordinates(school.Postcode).then(function(data) {
         allSchools[school.EstablishmentName].coordinates.push([data.data.easting, data.data.northing]);

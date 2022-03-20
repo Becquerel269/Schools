@@ -844,93 +844,77 @@ function drawcircle(easting, northing, size, label, identifier) {
     container.appendChild(newText);
 }
 
-//start my code 
-let schooldatacopy = [];
+//start of my code 
+let schoolDataCopy = [];
 
-function copySchoolsArray() {
-    schooldatacopy = [];
+function projectSchoolDataIntoSchoolDataCopy() {
+    schoolDataCopy = [];
     for (var i = 0; i < schooldata.length; i++) {
         var obj = schooldata[i];
-
         if (isNaN(obj.SchoolCapacity) || obj.SchoolCapacity === "") {
-            console.log(obj.SchoolCapacity);
             obj.SchoolCapacity = 0;
         }
-
         if (obj["LA (code)"] !== 0) {
-            //schooldatacopy.push(obj);
-            schooldatacopy.push(obj);
+            schoolDataCopy.push(obj);
         }
     }
 }
 
-
-function replaceKeys() {
-    replaceKey("LA (code)", "LA_Code");
-    replaceKey("LA (name)", "LA_Name");
+//renamed to remove spaces to allow use of dot notation
+function renameKeys() {
+    renameKey("LA (code)", "LA_Code");
+    renameKey("LA (name)", "LA_Name");
 }
 
-function sortSchoolsArray() {
-    schooldatacopy.sort((a, b) => (a.LA_Code > b.LA_Code) ? 1 : ((b.LA_Code > a.LA_Code) ? -1 : 0))
+function sortSchoolDataCopy() {
+    schoolDataCopy.sort((a, b) => (a.LA_Code > b.LA_Code) ? 1 : ((b.LA_Code > a.LA_Code) ? -1 : 0))
 }
 
-//utilities
-function replaceKey(oldKey, newKey) {
-    for (var i = 0; i < schooldatacopy.length; i++) {
-
-        var obj = schooldatacopy[i];
+function renameKey(oldKey, newKey) {
+    for (var i = 0; i < schoolDataCopy.length; i++) {
+        var obj = schoolDataCopy[i];
         if (obj[oldKey] !== undefined) {
             obj[newKey] = obj[oldKey];
             obj[newKey].value = obj[oldKey].value;
-
             delete(obj[oldKey]);
-            schooldatacopy.push(obj);
+            schoolDataCopy.push(obj);
+        } else if (obj[newKey] === undefined) {
+            //log that key was undefined
+            console.log(`undefined key ${oldKey} for element`, obj);
         }
     }
 }
-
-function collate() {
-    var stored = schooldatacopy.reduce(function(pV, cV, cI) {
-        var index = pV.findIndex(x => x.LA_Code === cV.LA_Code)
+//reduce elements in schoolDataCopy that have the same LA_Code into a single element
+//add property for the sum of all school capacities
+//sums all school capacities for that LA_Code and puts into the SumCapacity property
+function collateSchoolCapacities() {
+    const initialValue = [];
+    //using different name to global LAData variable
+    const laData = schoolDataCopy.reduce(function(processedItems, currentItems) {
+        let index = processedItems.findIndex(x => x.LA_Code === currentItems.LA_Code)
         if (index === -1) {
-            var obj = cV;
-            obj["SumCapacity"] = cV.SchoolCapacity;
-            pV.push(obj);
+            let obj = currentItems;
+            obj["SumCapacity"] = currentItems.SchoolCapacity;
+            processedItems.push(obj);
         } else {
-            //console.log(pV[index]);
-            pV[index].SumCapacity += cV.SchoolCapacity;
+            processedItems[index].SumCapacity += currentItems.SchoolCapacity;
         }
-        return pV;
-    }, []);
-    return stored;
+        return processedItems;
+    }, initialValue);
+    return laData;
 }
-//end my code
+//end of my code
 
 //process schools data
-
-copySchoolsArray();
-replaceKeys();
-sortSchoolsArray();
-var LAData = collate();
-//console.log(LAData);
-
-/* let schools = schooldata.reduce(function(allSchools, school) {
-    allSchools[school.EstablishmentName] = {
-        SchoolCapacity: school.SchoolCapacity || 0,
-        coordinates: []
-    }; */
-
-
+projectSchoolDataIntoSchoolDataCopy();
+renameKeys();
+sortSchoolDataCopy();
+var LAData = collateSchoolCapacities();
 let LAs = LAData.reduce(function(allLAs, LA) {
     allLAs[LA.LA_Name] = {
         SumCapacity: LA.SumCapacity || 0,
         coordinates: []
     };
-    //console.log(schooldatacopy);
-    /*   getcoordinates(school.Postcode).then(function(data) {
-          allSchools[school.EstablishmentName].coordinates.push([data.data.easting, data.data.northing]);
-          drawcircle(data.data.easting, data.data.northing, school.SchoolCapacity, school.EstablishmentName, school.URN);
-      }); */
     getcoordinates(LA.Postcode).then(function(data) {
         allLAs[LA.LA_Name].coordinates.push([data.data.easting, data.data.northing]);
         drawcircle(data.data.easting, data.data.northing, LA.SumCapacity, LA.LA_Name, LA.URN);
