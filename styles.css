@@ -16,3 +16,30 @@ Scenario: User views the LA Capacity page
   And each circle is located in an appropriate location for that local authority
   And each circle is labelled with the local authority name
 */
+
+
+/*
+Recoded as per instructions above - extra comments in code to explain my approach
+
+In a real world scenario I would:
+
+Seek confirmation from the end user what they mean by "according to the school capacity of that local authority"
+
+Consider whether an alternative solution would better fit the requirement from the end user that was "current map is difficult to use once all schools are displayed due to overlapping elements".
+
+The current solution has the following problems:
+Circle elements and names still overlap but not as much (tried dividing SumCapacity by 10, but names still overlap)
+User feedback didn't mention summing capacities by local authority
+Using a circle is misleading as doubling the capacity increases the area of the circle by a factor of four
+Some schools do not fit on this diagram, they don't have a postcode becuase they are not in the UK (in my solution I have filtered these out, may not be what the user wanted)
+The Department of Education as far as I'm aware only covers England as Education is devolved in Wales, however there is a School in Wales in the schoolsdata 
+The code is written in raw Javascript which has problems with global variables, not statically typed and may not be capatible with some browers (I have used es6 method where posssible)
+It is also difficult to unit test
+
+A better fitting solution might be to:
+Use a modern framework such angular or react (browser capability and unit testing)
+Use typescript instead of javascript (statically typed)
+Use google maps integration so that all schools can be shown and user can view only the details they are interested by clicking on a pin, a example of something similar is at: https://codesandbox.io/s/n9lrxw0670?file=/src/locations.json 
+The above also solves the circle scaling issue
+
+*/
